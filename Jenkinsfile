@@ -6,17 +6,18 @@ try {
 			def workspace = env.WORKSPACE
 			def sparseDir = 'android-devops-demo/'
 	  
-		stage('clean-workspace') {
-			cleanWs(workspace,sparseDir)
-		}
-		
+
 		stage('scm') {        
 			getGitLatest(workspace)   
 		}
-		  
+
+		stage('clean-workspace') {
+          			cleanWs(workspace,sparseDir)
+   		}
 
 
-	}//of node
+
+	}
 }
 catch (e){
 	echo 'EXCEPTION OCCURED'
