@@ -11,6 +11,10 @@ try {
 			getGitLatest(workspace)   
 		}
 
+	stage('android-sdk-check') {
+			androidSDKCheck()
+		}
+
 		stage('clean-workspace') {
           			cleanWs(workspace,sparseDir)
    		}
@@ -24,6 +28,28 @@ catch (e){
     echo "${e}"
 	error " Error during execution of pipeline"
 }
+
+def androidSDKCheck()
+  {
+    def currentPath = pwd()
+    echo currentPath
+    env.ANDROID_HOME = env.JENKINS_HOME + '/AndroidSDK'
+    echo env.ANDROID_HOME
+    echo 'Checking AndroidSDK...'
+
+    if(fileExists(env.ANDROID_HOME)) {
+            echo 'AndroidSDK Found'
+
+    } else {
+            echo 'AndroidSDK NOT Found'
+            sh ' curl --fail --output androidsdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip '
+            sh ' unzip androidsdk.zip -d AndroidSDK'
+            sh ' mv AndroidSDK $ANDROID_HOME '
+            sh ' mkdir -p $ANDROID_HOME/licenses '
+            sh 'echo "\\nd56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"'
+        }
+
+  }
 
 def cleanWs(workspace,sparseDir) {
 
