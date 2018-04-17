@@ -1,6 +1,6 @@
 try {
 	echo "EXECUTING jenkinsfile"
-	notifyMessengers()
+
 	
 	node{
 			def workspace = env.WORKSPACE
