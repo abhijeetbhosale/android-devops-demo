@@ -25,7 +25,6 @@ class LoginPresenter(view: LoginView) : BasePresenter<LoginView>(view) {
 
         return validatePasswordLength(password)
 
-        return true
 
     }
 

@@ -5,19 +5,27 @@ try {
 	node{
 			def workspace = env.WORKSPACE
 			def sparseDir = 'android-devops-demo/'
-	  
-
 		stage('scm') {        
 			getGitLatest(workspace)   
 		}
-
-	stage('android-sdk-check') {
+	    stage('android-sdk-check') {
 			androidSDKCheck()
 		}
-
 		stage('clean-workspace') {
-          			cleanWs(workspace,sparseDir)
+          	   cleanWs(workspace,sparseDir)
    		}
+   		stage('android-lint') {
+               androidLint()
+         }
+        stage('publish-android-lint-result'){
+               step([$class: 'LintPublisher', pattern: 'app/build/reports/lint-results*.xml'])
+        }
+        stage('android-unit-test') {
+               androidUnitTest()
+        }
+        stage('publish-android-junit-result'){
+        step([$class: 'JUnitResultArchiver', testResults: 'app/build/test-results/*/TEST-*.xml'])
+        }
 
 
 
@@ -82,68 +90,23 @@ def getGitLatest(workspace){
 	git branch: config.gitBranch, url: config.serviceRepo 
 }
 
-def mvnBuild(workspace,sparseDir){
-      echo "mvn-build"
-      echo "workspace directory is ${workspace}"
-      echo "${sparseDir}"
-      echo '${workspace}/${sparseDir}'
-      sh "cd ${workspace}/${sparseDir}"      
-      echo "current working directory is : " 
-      sh "pwd"
-      sh "mvn -f  ${workspace}/${sparseDir}/pom.xml clean compile package"
-}
-      
-def mvnSonar(workspace,sparseDir){
-	echo "executing mvn sonar:sonar"
-	withSonarQubeEnv("awsSonarQube") {
-		sh "mvn -f  ${workspace}/${sparseDir}/pom.xml sonar:sonar"// running locally
-    }
-}
-      
-def sonarQualityGate1(){
-	echo "executing Quality-Gate1"
-	
-	timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-    if (qg.status != 'OK') {
-		error "Pipeline aborted due to quality gate failure: ${qg.status}"
-     }
-	}
- }
-   
-def pcfPUSH1(workspace,sparseDir){
-     echo 'pcf-push' 
-     sh "cd ${workspace}/${sparseDir}/"
-     sh "cf login -a https://api.run.pivotal.io -o  anusheel -s development -u bhupesh.rathod@altimetrik.com -p Alti@123 "
-     sh "cf push -f ${workspace}/${sparseDir}/manifest.yml -t 179" 
- }
- 
-def executeJmeter(workspace,sparseDir){
-	echo 'executeJmeter' 
-	sh "cd ${workspace}/${sparseDir}/src/test/jmeter"
-	sh "pwd"
-	sh "ls -l"
-	
-	sh "/var/lib/apache-jmeter-4.0/bin/jmeter  -n -t ${workspace}/${sparseDir}/src/test/jmeter/Jmeter101_AssertionPass.jmx > 101-failed.csv"
+
+def androidLint(){
+	echo "executing Android lint"
+	sh ' chmod a+x gradlew '
+    sh ' ./gradlew lint '
+    echo "Android lint finished"
 }
 
-def jmeterQualityGate2(){
-	sh "ls -l"
-	//perfReport percentiles: '0,50,90,100', sourceDataFiles: ''
-	//build job: 'JMeter - Freestyle'
-	//def errorCode = ''
-	
-	errorCode = sh  """ awk ' { if (\$14 == "Err:" && \$15 !=0 ) {print "ERROR"; exit 1;} }' 101-failed.csv"""
-	
-	//sh "$errorCode"
- }
- 
- def executefunctionlTest(workspace,sparseDir){
-	echo 'executefunctionlTest' 
-	sh "mvn -f  ${workspace}/${sparseDir}/pom.xml  test -Dtest=**/FT*Tests"// running locally
-	
- }
- 
+
+def androidUnitTest(){
+	echo "executing Android unit test"
+	sh ' chmod a+x gradlew '
+    sh ' ./gradlew test '
+    echo "Android unit test task finished"
+}
+
+
 
 
    

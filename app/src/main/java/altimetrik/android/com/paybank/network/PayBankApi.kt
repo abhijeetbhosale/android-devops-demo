@@ -16,23 +16,23 @@ import retrofit2.http.*
  */
 interface PayBankApi {
 
-    @GET("https://pay-bank-login.cfapps.io/pay-bank/api/v1/login/")
+    @GET("https://pay-bank-login-dev.cfapps.io/pay-bank/api/v1/login/")
     fun doLogin(@Query("password") password: String, @Query("userName") username: String): Observable<User>
 
     //Beneficiary list
-    @GET("https://pay-bank-beneficiary.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/beneficiaries")
+    @GET("https://pay-bank-beneficiary-dev.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/beneficiaries")
     fun fetchBeneficiaryList(@Path("customerId") customerId: String, @Query("sessionKey") sessionKey: String): Observable<ArrayList<Beneficiary>>
 
     //Account list
-    @GET("https://pay-bank-transaction.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/accounts")
+    @GET("https://pay-bank-transaction-dev.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/accounts")
     fun fetchAccounts(@Path("customerId") customerId: String, @Query("sessionKey") sessionKey: String): Observable<ArrayList<Account>>
 
     //Statement
-    @GET("https://pay-bank-transaction.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/accounts/{accountId}/transactions/")
+    @GET("https://pay-bank-transaction-dev.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/accounts/{accountId}/transactions/")
     fun fetchStatement(@Path("customerId") customerId: String, @Path("accountId") accountId: String): Observable<User>
 
 
-    @POST("https://pay-bank-beneficiary.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/beneficiaries")
+    @POST("https://pay-bank-beneficiary-dev.cfapps.io/pay-bank/api/v1/banks/1/branches/1/customers/{customerId}/beneficiaries")
     fun addBeneficiary(@Path("customerId") customerId: String, @Body addBeneficiaryRequest: AddBeneficiaryRequest): Observable<AddBeneficiaryResponse>
 
     companion object Factory {
