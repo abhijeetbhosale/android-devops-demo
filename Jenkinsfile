@@ -18,7 +18,14 @@ try {
                androidLint()
          }
         stage('publish-android-lint-result'){
-               step([$class: 'HtmlPublisher', pattern: 'app/build/reports/lint-results*.html'])
+             publishHTML([allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: false,
+              reportDir: 'app/build/reports/',
+              reportFiles: 'lint-results*.html',
+              reportName: 'Lint Report',
+              reportTitles: ''
+              ])
         }
         stage('android-unit-test') {
                androidUnitTest()
