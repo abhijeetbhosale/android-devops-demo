@@ -156,7 +156,7 @@ def assembleApk(){
 def uploadBuildOnHockeyApp(){
 echo "executing upload build on HockeyApp"
 step([$class: 'HockeyappRecorder',
-      applications: [[apiToken: 'ca5dde39e9e84b0c9a44c4c4e1ad529e', downloadAllowed: true,
+      applications: [[apiToken: 'b26f9be3381c44cb8adef7a1d065c5e6', downloadAllowed: true,
                       filePath: 'app/build/outputs/apk/*/*.apk', mandatory: false, notifyTeam: true,
                       releaseNotesMethod: [$class: 'ChangelogReleaseNotes'],
                       uploadMethod: [$class: 'AppCreation', publicPage: false]]],
