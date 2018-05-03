@@ -27,6 +27,9 @@ try {
               reportTitles: ''
               ])
         }
+        stage('build-sonar-analysis') {
+               gradleSonar()
+        }
         stage('build-android-unit-test') {
                androidUnitTest()
         }
