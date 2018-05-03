@@ -8,16 +8,16 @@ try {
 		stage('scm') {        
 			getGitLatest(workspace)   
 		}
-	    stage('android-sdk-check') {
+	    stage('build-android-sdk-check') {
 			androidSDKCheck()
 		}
-		stage('clean-workspace') {
+		stage('build-clean-workspace') {
           	   cleanWs(workspace,sparseDir)
    		}
-   		stage('android-lint') {
+   		stage('build-android-lint') {
                androidLint()
          }
-        stage('publish-android-lint-result'){
+        stage('build-publish-android-lint-result'){
              publishHTML([allowMissing: false,
               alwaysLinkToLastBuild: false,
               keepAll: false,
@@ -27,15 +27,26 @@ try {
               reportTitles: ''
               ])
         }
-        stage('android-unit-test') {
+        stage('build-android-unit-test') {
                androidUnitTest()
         }
-        stage('publish-android-junit-result'){
-        step([$class: 'JUnitResultArchiver', testResults: 'app/build/test-results/*/TEST-*.xml'])
+        stage('build-publish-android-junit-result'){
+            publishHTML([allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/reports/',
+                  reportFiles: 'index*.html',
+                  reportName: 'JUnit Test Report',
+                  reportTitles: ''
+                  ])
+
         }
-
-
-
+        stage('build-assemble-debug-apk'){
+        assembleApk()
+        }
+        stage('build-upload-build-on-hockeyapp'){
+        uploadBuildOnHockeyApp()
+        }
 	}
 }
 catch (e){
@@ -114,6 +125,43 @@ def androidUnitTest(){
 }
 
 
+def gradleSonar(){
+	echo "Executing sonar quality"
+	withSonarQubeEnv("awsSonarQube") {
+		sh ' chmod a+x gradlew '
+        sh ' ./gradlew clean sonarqube '
+    }
+}
 
+def sonarQualityGate1(){
+	echo "executing Quality-Gate1"
+
+	timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+    if (qg.status != 'OK') {
+		error "Pipeline aborted due to quality gate failure: ${qg.status}"
+     }
+	}
+ }
+
+
+def assembleApk(){
+	echo "Executing assemble apk"
+
+		sh ' chmod a+x gradlew '
+        sh ' ./gradlew assembleDebug '
+
+}
+
+
+def uploadBuildOnHockeyApp(){
+echo "executing upload build on HockeyApp"
+step([$class: 'HockeyappRecorder',
+      applications: [[apiToken: 'ca5dde39e9e84b0c9a44c4c4e1ad529e', downloadAllowed: true,
+                      filePath: 'app/build/reports/apk/*/*.apk', mandatory: false, notifyTeam: true,
+                      releaseNotesMethod: [$class: 'ChangelogReleaseNotes'],
+                      uploadMethod: [$class: 'AppCreation', publicPage: false]]],
+      debugMode: false, failGracefully: false])
+}
 
    
