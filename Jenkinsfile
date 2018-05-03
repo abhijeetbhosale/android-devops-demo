@@ -147,7 +147,6 @@ def sonarQualityGate1(){
 
 def assembleApk(){
 	echo "Executing assemble apk"
-
 		sh ' chmod a+x gradlew '
         sh ' ./gradlew assembleDebug '
 
@@ -158,7 +157,7 @@ def uploadBuildOnHockeyApp(){
 echo "executing upload build on HockeyApp"
 step([$class: 'HockeyappRecorder',
       applications: [[apiToken: 'ca5dde39e9e84b0c9a44c4c4e1ad529e', downloadAllowed: true,
-                      filePath: 'app/build/reports/apk/*/*.apk', mandatory: false, notifyTeam: true,
+                      filePath: 'app/build/outputs/apk/*/*.apk', mandatory: false, notifyTeam: true,
                       releaseNotesMethod: [$class: 'ChangelogReleaseNotes'],
                       uploadMethod: [$class: 'AppCreation', publicPage: false]]],
       debugMode: false, failGracefully: false])
