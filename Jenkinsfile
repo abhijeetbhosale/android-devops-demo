@@ -8,26 +8,7 @@ try {
 		stage('scm') {        
 			getGitLatest(workspace)   
 		}
-	    stage('build-android-sdk-check') {
-			androidSDKCheck()
-		}
-		stage('build-clean-workspace') {
-          	   cleanWs(workspace,sparseDir)
-   		}
-   		stage('build-android-lint') {
-               androidLint()
-         }
-        stage('build-publish-android-lint-result'){
-             publishHTML([allowMissing: false,
-              alwaysLinkToLastBuild: false,
-              keepAll: false,
-              reportDir: 'app/build/reports/',
-              reportFiles: 'lint-results*.html',
-              reportName: 'Lint Report',
-              reportTitles: ''
-              ])
-        }
-        stage('build-sonar-analysis') {
+	      stage('build-sonar-analysis') {
                gradleSonar()
         }
         stage('build-android-unit-test') {
