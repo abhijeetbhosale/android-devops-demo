@@ -132,7 +132,7 @@ def gradleSonar(){
 	echo "Executing sonar quality"
 	withSonarQubeEnv("awsSonarQube") {
 		sh ' chmod a+x gradlew '
-        sh ' ./gradlew clean sonarqube '
+        sh ' ./gradlew clean sonarqube --info --stacktrace'
     }
 }
 
