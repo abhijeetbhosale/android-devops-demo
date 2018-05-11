@@ -8,7 +8,11 @@ try {
 		stage('scm') {        
 			getGitLatest(workspace)   
 		}
-	      stage('build-sonar-analysis') {
+	    stage('build-android-sdk-check') {
+			androidSDKCheck()
+		}
+
+        stage('build-sonar-analysis') {
                gradleSonar()
         }
         stage('build-android-unit-test') {
