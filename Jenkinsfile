@@ -1,7 +1,5 @@
 try {
 	echo "EXECUTING jenkinsfile"
-
-	
 	node{
 			def workspace = env.WORKSPACE
 			def sparseDir = 'android-devops-demo/'
@@ -11,10 +9,23 @@ try {
 	    stage('build-android-sdk-check') {
 			androidSDKCheck()
 		}
-
-        stage('build-sonar-analysis') {
-               gradleSonar()
+        stage('build-clean-workspace') {
+          	   cleanWs(workspace,sparseDir)
+   		}
+   		stage('build-android-lint') {
+               androidLint()
+         }
+        stage('build-publish-android-lint-result'){
+             publishHTML([allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: false,
+              reportDir: 'app/build/reports/',
+              reportFiles: 'lint-results*.html',
+              reportName: 'Lint Report',
+              reportTitles: ''
+              ])
         }
+
         stage('build-android-unit-test') {
                androidUnitTest()
         }
@@ -28,6 +39,9 @@ try {
                   reportTitles: ''
                   ])
 
+        }
+        stage('build-sonar-analysis') {
+                       gradleSonar()
         }
         stage('build-assemble-debug-apk'){
         assembleApk()

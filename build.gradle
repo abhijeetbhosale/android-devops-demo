@@ -17,6 +17,10 @@ buildscript {
     }
 }
 
+/*configurations {
+    fortify { extendsFrom compile }
+}*/
+
 allprojects {
     repositories {
         google()
@@ -30,3 +34,6 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+
