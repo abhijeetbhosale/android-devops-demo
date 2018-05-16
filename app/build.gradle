@@ -51,7 +51,6 @@ sonarqube() {
         property "sonar.exclusions", "build/**,**/*.png,*.iml, **/*generated*,"
         property "sonar.import_unknown_files", true
         property "sonar.android.lint.report", "./build/reports/lint-results.xml"
-        property "sonar.host.url", SONAR_HOST
         property "sonar.tests", "./src/test/, ./src/androidTest/"
         property "sonar.jacoco.reportPath", fileTree(dir: project.projectDir, includes: ['**/*.exec'])
         property "sonar.java.test.binaries", "${project.buildDir}/intermediates/classes/debug"
